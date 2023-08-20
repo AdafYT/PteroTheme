@@ -1,0 +1,92 @@
+
+
+from disnake.ext import commands, tasks
+from disnake.ext import commands
+import disnake
+from PIL import Image, ImageDraw, ImageColor, ImageFont, ImageFilter, ImageOps
+from io import BytesIO
+import requests
+import io
+import imageio
+from PIL import Image, ImageDraw, ImageFont
+from quickdb import SQLITE
+import os
+from io import BytesIO
+from PIL import Image, ImageDraw, ImageFont
+import os
+import asyncio
+client = disnake.Client()
+
+intents = disnake.Intents.default()
+intents.members = True
+intents.message_content = True
+intents.presences = True
+client = commands.Bot(command_prefix=commands.when_mentioned_or(.), intents=intents)
+client.remove_command(help)
+# Здесь необходимо указать ID вашего сервера
+GUILD_ID = 1024396168874164355
+
+
+
+@tasks.loop(minutes=1)
+async def update_banner()
+    guild = client.get_guild(GUILD_ID)
+    members_online = sum(1 for member in guild.members if member.voice and not member.bot)
+    boost_count = guild.premium_subscription_count
+
+    # Открываем изображение фона
+    bg_image = Image.open('backgrounddefolt_background.png')
+
+    # Создаем новое изображение с размерами фона
+    img = Image.new('RGBA', bg_image.size, (255, 255, 255, 0))
+
+    # Налагаем фоновое изображение на созданное изображение
+    img.alpha_composite(bg_image)
+
+    idraw = ImageDraw.Draw(img)
+
+    # Добавление информации о сервере и голосовом онлайне
+    server_font = ImageFont.truetype('appetite.ttf', size=50)
+    boost_font = ImageFont.truetype(f'appetite.ttf', size=50)
+    level = ImageFont.truetype(f'bahnschrift.ttf', size=50)
+    xp = ImageFont.truetype(f'bahnschrift.ttf', size=30)
+
+    text_bbox = idraw.textbbox((0, 0), f'{members_online} ', font=server_font)
+    x = img.width - text_bbox[2] - 780 # 300 - отступ справа
+    y = img.height  2 + 110 + text_bbox[3]  2
+
+    # Добавление текста на изображение
+    idraw.text((x, y), f'{members_online} ', font=server_font, fill='#EAE7DC')
+
+    text = f'{guild.member_count} '
+    text_bbox = idraw.textbbox((0, 0), text, font=server_font)
+    x = img.width - text_bbox[2] - 750 # 300 - отступ справа
+    y = img.height  2 + -20 + text_bbox[3]  2
+    idraw.text((x, y), text, font=server_font, fill='#EAE7DC')
+
+
+    boost_text = f'Бустов {boost_count}'
+    boost_text_size = idraw.textbbox((0, 0), text, font=boost_font)
+    boost_x = img.width - text_bbox[2] - 300 # 300 - отступ справа
+    boost_y = img.height  2 + 200 + text_bbox[3]  2
+    idraw.text((x, y), text, font=server_font, fill='#EAE7DC')
+    idraw.text((boost_x, boost_y), boost_text, font=boost_font, fill='#EAE7DC')
+
+
+    img.save('member_rank.png')
+
+    with open('member_rank.png', 'rb') as f
+        image = f.read()
+    await guild.edit(banner=image)
+
+@client.event
+async def on_ready()
+    # Запускаем асинхронную задачу на обновление баннера
+    await asyncio.create_task(update_banner_loop())
+
+async def update_banner_loop()
+    while True
+        await update_banner()
+        await asyncio.sleep(240)  # 240 секунд = 4 минуты
+
+client.run('MTA5NzgwMzUyMTExOTc2NDQ4MQ.GZRRvC.9I3xQk9ArA3PWaG7G4t-U2UIaFr1GucIX27TxQ')
